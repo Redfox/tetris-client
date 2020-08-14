@@ -21,10 +21,21 @@ export class Game {
 
   public init(): void {
     this.renderBoard();
-    this.x = 0;
-    this.y = 0;
+    this.x = 5;
+    this.y = 3;
 
-    setInterval(() => this.loop(), 500);
+    this.loop();
+    this.update();
+
+    document.addEventListener('keypress', (key) => {
+      if (key.key === 'a' && this.x > 0) {
+        this.x -= 1;
+      } else if (key.key === 'd' && this.x < 9) {
+        this.x += 1;
+      } else if (key.key === 's' && this.y < 19) {
+        this.y += 1;
+      }
+    });
   }
 
   private draw(): void {
@@ -33,6 +44,14 @@ export class Game {
 
     const columns = 10;
     const w = this.width / columns;
+
+    if (this.y < 19) {
+      this.context.strokeStyle = '#FFFF';
+      this.context.strokeRect(w * this.x, w * 19, w - 0.2, w - 0.2);
+      this.context.strokeRect(w * (this.x + 1), w * (19 - 1), w - 0.2, w - 0.2);
+      this.context.strokeRect(w * (this.x + 1), w * 19, w - 0.2, w - 0.2);
+      this.context.strokeRect(w * (this.x + 2), w * 19, w - 0.2, w - 0.2);
+    }
 
     this.context.fillStyle = '#e3213b';
     this.context.fillRect(w * this.x, w * this.y, w - 0.2, w - 0.2);
@@ -58,7 +77,7 @@ export class Game {
   }
 
   private update(): void {
-    if (this.y < 19) this.y += 1;
+    setInterval(() => { if (this.y < 19) this.y += 1; }, 1000);
   }
 
   private roundRect(
@@ -83,8 +102,8 @@ export class Game {
 
   private loop(): void {
     requestAnimationFrame(() => {
-      this.update();
       this.draw();
+      this.loop();
     });
   }
 }
