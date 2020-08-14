@@ -5,6 +5,10 @@ export class Game {
 
   private height: number;
 
+  private x!: number;
+
+  private y!: number;
+
   constructor(
     width: number,
     height: number,
@@ -17,9 +21,27 @@ export class Game {
 
   public init(): void {
     this.renderBoard();
+    this.x = 0;
+    this.y = 0;
+
+    setInterval(() => this.loop(), 500);
   }
 
-  private renderBoard() {
+  private draw(): void {
+    this.context.clearRect(0, 0, this.width, this.height);
+    this.renderBoard();
+
+    const columns = 10;
+    const w = this.width / columns;
+
+    this.context.fillStyle = '#e3213b';
+    this.context.fillRect(w * this.x, w * this.y, w - 0.2, w - 0.2);
+    this.context.fillRect(w * (this.x + 1), w * (this.y - 1), w - 0.2, w - 0.2);
+    this.context.fillRect(w * (this.x + 1), w * this.y, w - 0.2, w - 0.2);
+    this.context.fillRect(w * (this.x + 2), w * this.y, w - 0.2, w - 0.2);
+  }
+
+  private renderBoard(): void {
     this.context.fillStyle = 'black';
     this.context.fillRect(0, 0, this.width, this.height);
 
@@ -33,12 +55,10 @@ export class Game {
         this.context.fillRect(w * i, w * j, w - 0.2, w - 0.2);
       }
     }
+  }
 
-    this.context.fillStyle = '#e3213b';
-    this.context.fillRect(w * 3, w * 3, w - 0.2, w - 0.2);
-    this.context.fillRect(w * 3, w * 4, w - 0.2, w - 0.2);
-    this.context.fillRect(w * 4, w * 4, w - 0.2, w - 0.2);
-    this.context.fillRect(w * 2, w * 4, w - 0.2, w - 0.2);
+  private update(): void {
+    if (this.y < 19) this.y += 1;
   }
 
   private roundRect(
@@ -59,5 +79,12 @@ export class Game {
     this.context.closePath();
     this.context.fill();
     return this;
+  }
+
+  private loop(): void {
+    requestAnimationFrame(() => {
+      this.update();
+      this.draw();
+    });
   }
 }
