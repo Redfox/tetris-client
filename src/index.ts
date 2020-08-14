@@ -1,4 +1,4 @@
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const context = canvas.getContext("2d");
+import { Game } from "./game";
 
-if (!context) throw new Error("Error");
+const game = new Game();
+game.init();
