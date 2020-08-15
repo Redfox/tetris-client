@@ -30,4 +30,8 @@ export class Canvas2D {
     this.context.strokeStyle = this.strokeStyle;
     this.context.strokeRect(x, y, w, h);
   }
+
+  public clear(): void {
+    this.context.clearRect(0, 0, this.width, this.height);
+  }
 }
