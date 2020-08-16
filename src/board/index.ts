@@ -16,10 +16,15 @@ export class Board {
   private y = 3;
 
   private tile = [
+    // { x: 0, y: 0 },
+    // { x: 0, y: -1 },
+    // { x: -1, y: 0 },
+    // { x: +1, y: 0 },
+
     { x: 0, y: 0 },
-    { x: 0, y: -1 },
     { x: -1, y: 0 },
-    { x: +1, y: 0 },
+    { x: 0, y: -1 },
+    { x: 0, y: +1 },
   ]
 
   constructor() {
@@ -29,6 +34,16 @@ export class Board {
     this.board = [];
 
     this.createBoard();
+
+    document.addEventListener('keydown', (key) => {
+      if (key.key === 'a' && this.x - 1 > 0) {
+        this.x -= 1;
+      } else if (key.key === 'd' && this.x < 9) {
+        this.x += 1;
+      } else if (key.key === 's' && this.y < 19 + Math.min.apply(null, this.tile.map((t) => t.y))) {
+        this.y += 1;
+      }
+    });
   }
 
   public renderTiles(): void {
@@ -51,13 +66,16 @@ export class Board {
     let last = 0;
 
     for (let row = 0; row < this.board.length; row++) {
-      for (let col = 0; col < this.board[row].length; col++) {
-        if (this.board[row][col].filled) {
-          last = row < last || last === 0 ? row - 1 : last;
-          break;
-        }
-      }
+      this.tile
+        // eslint-disable-next-line no-loop-func
+        .forEach((d) => {
+          if (this.board[row - d.y] && this.board[row - d.y][this.x + d.x].filled) {
+            last = row < last || last === 0 ? row - 1 : last;
+          }
+        });
     }
+
+    last = last === 0 ? 19 + Math.min.apply(null, this.tile.map((t) => t.y)) : last;
 
     this.canvas.fillStyle = '#e3213b';
     this.tile.forEach((dotTile) => {
@@ -67,14 +85,12 @@ export class Board {
         this.size - 0.2, this.size - 0.2,
       );
 
-      if (this.y < 19) {
-        this.canvas.strokeStyle = '#FFFF';
-        this.canvas.strokeRect(
-          this.size * (this.x + dotTile.x),
-          this.size * (last + dotTile.y),
-          this.size - 0.2, this.size - 0.2,
-        );
-      }
+      this.canvas.strokeStyle = '#FFFF';
+      this.canvas.strokeRect(
+        this.size * (this.x + dotTile.x),
+        this.size * (last + dotTile.y),
+        this.size - 0.2, this.size - 0.2,
+      );
     });
   }
 
