@@ -9,16 +9,6 @@ export class Game {
 
   public init(): void {
     this.loop();
-
-    // document.addEventListener('keypress', (key) => {
-    //   if (key.key === 'a' && this.x > 0) {
-    //     this.x -= 1;
-    //   } else if (key.key === 'd' && this.x < 9) {
-    //     this.x += 1;
-    //   } else if (key.key === 's' && this.y < 19) {
-    //     this.y += 1;
-    //   }
-    // });
   }
 
   private loop(): void {

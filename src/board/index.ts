@@ -11,20 +11,31 @@ export class Board {
 
   private size: number;
 
-  private x = 3;
+  private x = 4;
 
   private y = 3;
 
   private tile = [
-    // { x: 0, y: 0 },
-    // { x: 0, y: -1 },
-    // { x: -1, y: 0 },
-    // { x: +1, y: 0 },
-
     { x: 0, y: 0 },
     { x: -1, y: 0 },
     { x: 0, y: -1 },
     { x: 0, y: +1 },
+  ]
+
+  private side = 0;
+
+  private even = [
+    { x: 0, y: 0 },
+    { x: -1, y: 0 },
+    { x: 0, y: -1 },
+    { x: 0, y: +1 },
+  ]
+
+  private odd = [
+    { x: 0, y: 0 },
+    { x: 0, y: -1 },
+    { x: -1, y: 0 },
+    { x: +1, y: 0 },
   ]
 
   constructor() {
@@ -36,7 +47,9 @@ export class Board {
     this.createBoard();
 
     document.addEventListener('keydown', (key) => {
-      if (key.key === 'a' && this.x - 1 > 0) {
+      if (key.key === 'w') {
+        this.side += 1;
+      } else if (key.key === 'a' && this.x - 1 > 0) {
         this.x -= 1;
       } else if (key.key === 'd' && this.x < 9) {
         this.x += 1;
@@ -47,6 +60,8 @@ export class Board {
   }
 
   public renderTiles(): void {
+    this.tile = this.side % 2 === 0 ? this.even : this.odd;
+
     this.canvas.clear();
 
     this.canvas.fillStyle = '#000000';
@@ -63,19 +78,17 @@ export class Board {
   }
 
   public tiles(): void {
-    let last = 0;
+    let last = 19;
 
-    for (let row = 0; row < this.board.length; row++) {
+    for (let row = 19; row >= 0; row--) {
       this.tile
         // eslint-disable-next-line no-loop-func
         .forEach((d) => {
-          if (this.board[row - d.y] && this.board[row - d.y][this.x + d.x].filled) {
-            last = row < last || last === 0 ? row - 1 : last;
+          if (this.board[row][this.x + d.x].filled) {
+            last = (row - (d.y > 0 ? d.y : 0)) - 1;
           }
         });
     }
-
-    last = last === 0 ? 19 + Math.min.apply(null, this.tile.map((t) => t.y)) : last;
 
     this.canvas.fillStyle = '#e3213b';
     this.tile.forEach((dotTile) => {
