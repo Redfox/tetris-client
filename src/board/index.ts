@@ -15,28 +15,23 @@ export class Board {
 
   private y = 3;
 
-  private tile = [
-    { x: 0, y: 0 },
-    { x: -1, y: 0 },
-    { x: 0, y: -1 },
-    { x: 0, y: +1 },
-  ]
-
   private side = 0;
 
-  private even = [
+  private even: Array<{ x: number, y: number }> = [
     { x: 0, y: 0 },
     { x: -1, y: 0 },
     { x: 0, y: -1 },
     { x: 0, y: +1 },
   ]
 
-  private odd = [
+  private odd: Array<{ x: number, y: number }> = [
     { x: 0, y: 0 },
     { x: 0, y: -1 },
     { x: -1, y: 0 },
     { x: +1, y: 0 },
   ]
+
+  private tile = this.even;
 
   constructor() {
     this.canvas = new Canvas2D();
@@ -53,16 +48,23 @@ export class Board {
         this.x -= 1;
       } else if (key.key === 'd' && this.x < 9) {
         this.x += 1;
-      } else if (key.key === 's' && this.y < 19 + Math.min.apply(null, this.tile.map((t) => t.y))) {
+      } else if (key.key === 's' && this.y < 20 + Math.min.apply(null, this.tile.map((t) => t.y))) {
         this.y += 1;
       }
     });
   }
 
   public renderTiles(): void {
-    this.tile = this.side % 2 === 0 ? this.even : this.odd;
-
     this.canvas.clear();
+
+    const newTilePosition = this.side % 2 === 0 ? this.even : this.odd;
+    if (this.x > (9 - Math.max.apply(null, newTilePosition.map((t) => t.x)))) {
+      this.x -= Math.max.apply(null, newTilePosition.map((t) => t.x));
+    } else if (this.x < (0 - Math.min.apply(null, newTilePosition.map((t) => t.x)))) {
+      this.x -= Math.min.apply(null, newTilePosition.map((t) => t.x));
+    }
+
+    this.tile = newTilePosition;
 
     this.canvas.fillStyle = '#000000';
     this.canvas.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -80,7 +82,7 @@ export class Board {
   public tiles(): void {
     let last = 19;
 
-    for (let row = 19; row >= 0; row--) {
+    for (let row = 19; row >= this.y; row--) {
       this.tile
         // eslint-disable-next-line no-loop-func
         .forEach((d) => {
@@ -88,6 +90,12 @@ export class Board {
             last = (row - (d.y > 0 ? d.y : 0)) - 1;
           }
         });
+    }
+
+    if (last === 19) {
+      this.tile.map((d) => d.y).forEach((y) => {
+        last -= (y > 0 ? y : 0);
+      });
     }
 
     this.canvas.fillStyle = '#e3213b';
@@ -111,7 +119,7 @@ export class Board {
     this.canvas.fillStyle = '#2e2e2e';
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.columns; col++) {
-        const filled = row > 16 ? Math.random() >= 0.5 : false;
+        const filled = false; // row > 16 ? Math.random() >= 0.5 : false;
         if (!this.board[row]) {
           this.board.push([{ filled }]);
         } else {
@@ -119,5 +127,7 @@ export class Board {
         }
       }
     }
+
+    this.board[17][3] = { filled: true };
   }
 }
